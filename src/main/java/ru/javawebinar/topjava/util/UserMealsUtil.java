@@ -58,11 +58,11 @@ public class UserMealsUtil {
         return mealList
                 .stream()
                 .collect(Collectors.groupingBy(meal -> meal.getDateTime().toLocalDate()))
-                .entrySet()
+                .values()
                 .stream()
                 .flatMap(e -> {
-                    int caloriesSum = e.getValue().stream().map(UserMeal::getCalories).reduce(0, Integer::sum);
-                    return e.getValue().stream()
+                    int caloriesSum = e.stream().map(UserMeal::getCalories).reduce(0, Integer::sum);
+                    return e.stream()
                             .filter(meal -> TimeUtil.isBetween(meal.getDateTime().toLocalTime(), startTime, endTime))
                             .map(meal -> new UserMealWithExceed(meal.getDateTime(),
                                     meal.getDescription(),
