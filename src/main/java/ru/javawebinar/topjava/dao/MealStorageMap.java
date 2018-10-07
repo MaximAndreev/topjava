@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.dao;
 
 import ru.javawebinar.topjava.model.Meal;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,43 +13,29 @@ public class MealStorageMap implements MealStorage {
     private final Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
 
     @Override
-    public Meal create(LocalDateTime dateTime, String description, int calories) {
-        Meal meal = new Meal(counter.incrementAndGet(), dateTime, description, calories);
+    public Meal create(Meal meal) {
+        meal.setId(counter.incrementAndGet());
         mealMap.put(meal.getId(), meal);
         return meal;
     }
 
     @Override
-    public Meal read(String id) {
-        try {
-            return mealMap.get(Integer.valueOf(id));
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    public Meal read(Integer id) {
+        return mealMap.get(id);
     }
 
     @Override
-    public boolean update(Meal updatedMeal) {
+    public Meal update(Meal updatedMeal) {
         Integer id = updatedMeal.getId();
         if (mealMap.containsKey(id)) {
-            mealMap.put(id, updatedMeal);
-            return true;
+            return mealMap.put(id, updatedMeal);
         }
-        return false;
+        return null;
     }
 
     @Override
-    public boolean delete(String id) {
-        try {
-            Integer idInt = Integer.valueOf(id);
-            if (mealMap.containsKey(idInt)) {
-                mealMap.remove(idInt);
-                return true;
-            }
-            return false;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    public Meal delete(Integer id) {
+        return mealMap.remove(id);
     }
 
     @Override

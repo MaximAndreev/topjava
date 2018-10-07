@@ -2,17 +2,16 @@ package ru.javawebinar.topjava.dao;
 
 import ru.javawebinar.topjava.model.Meal;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MealStorage {
-    Meal create(LocalDateTime dateTime, String description, int calories);
+    Meal create(Meal meal);
 
-    Meal read(String id);
+    Meal read(Integer id);
 
-    boolean update(Meal updatedMeal);
+    Meal update(Meal updatedMeal);
 
-    boolean delete(String id);
+    Meal delete(Integer id);
 
     List<Meal> getAll();
 }
