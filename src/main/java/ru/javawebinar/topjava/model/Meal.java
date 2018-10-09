@@ -1,11 +1,14 @@
 package ru.javawebinar.topjava.model;
 
+import ru.javawebinar.topjava.util.TimeUtil;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Objects;
 
 public class Meal {
+    public static final Meal EMPTY = new Meal();
+
     private int id;
 
     private final LocalDateTime dateTime;
@@ -13,6 +16,10 @@ public class Meal {
     private final String description;
 
     private final int calories;
+
+    private Meal() {
+        this(0, TimeUtil.NO_LOCAL_DATE_TIME, "", 0);
+    }
 
     public Meal(LocalDateTime dateTime, String description, int calories) {
         this(0, dateTime, description, calories);
@@ -51,22 +58,6 @@ public class Meal {
 
     public LocalTime getTime() {
         return dateTime.toLocalTime();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Meal meal = (Meal) o;
-        return id == meal.id &&
-                calories == meal.calories &&
-                Objects.equals(dateTime, meal.dateTime) &&
-                Objects.equals(description, meal.description);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, dateTime, description, calories);
     }
 
     @Override

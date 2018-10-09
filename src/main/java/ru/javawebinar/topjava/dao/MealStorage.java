@@ -11,7 +11,7 @@ public interface MealStorage {
 
     Meal update(Meal updatedMeal);
 
-    Meal delete(Integer id);
+    boolean delete(Integer id);
 
     List<Meal> getAll();
 }

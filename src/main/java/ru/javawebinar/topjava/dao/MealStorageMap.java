@@ -34,8 +34,8 @@ public class MealStorageMap implements MealStorage {
     }
 
     @Override
-    public Meal delete(Integer id) {
-        return mealMap.remove(id);
+    public boolean delete(Integer id) {
+        return mealMap.remove(id) != null;
     }
 
     @Override

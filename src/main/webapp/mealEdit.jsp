@@ -8,18 +8,18 @@
 <h3><a href="${pageContext.request.getServletContext().getContextPath()}${'/index.html'}">Home</a></h3>
 <h2>Edit Meal</h2>
 <form method="post" action="" enctype="application/x-www-form-urlencoded">
-    <input name="id" type="hidden" value="${meal != null ? meal.id : ''}">
+    <input name="id" type="hidden" value="${meal.id}">
     <dl>
         <dt>Время</dt>
-        <input name="dateTimeString" type="datetime-local" value="${meal != null ? meal.dateTime : ''}">
+        <input name="dateTimeString" type="datetime-local" value="${meal.dateTime}">
     </dl>
     <dl>
         <dt>Описание</dt>
-        <textarea name="description" cols="30" rows="5">${meal != null ? meal.description : ''}</textarea>
+        <textarea name="description" cols="30" rows="5">${meal.description}</textarea>
     </dl>
     <dl>
         <dt>Калории</dt>
-        <input name="calories" type="number" value="${meal != null ? meal.calories : ''}">
+        <input name="calories" type="number" value="${meal.calories}">
     </dl>
     <button type="submit">Сохранить</button>
     <button onabort="window.history.back()">Назад</button>
