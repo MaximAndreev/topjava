@@ -77,7 +77,7 @@ public class MealServlet extends HttpServlet {
             switch (action) {
                 case "add": {
                     log.debug("add new meal");
-                    request.setAttribute("meal", Meal.EMPTY);
+                    request.setAttribute("meal", new Meal(0, LocalDateTime.now().withSecond(0).withNano(0), "", 0));
                     request.getRequestDispatcher("/mealEdit.jsp").forward(request, response);
                     return;
                 }

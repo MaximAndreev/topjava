@@ -5,7 +5,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class TimeUtil {
-    public static final LocalDateTime NO_LOCAL_DATE_TIME = LocalDateTime.of(1, 1, 1, 0, 0);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm yyyy-MM-dd");
 
     public static boolean isBetween(LocalTime lt, LocalTime startTime, LocalTime endTime) {
