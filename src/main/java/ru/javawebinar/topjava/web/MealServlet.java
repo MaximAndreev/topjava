@@ -34,8 +34,8 @@ public class MealServlet extends HttpServlet {
 
     @Override
     public void destroy() {
-        super.destroy();
         appCtx.close();
+        super.destroy();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class MealServlet extends HttpServlet {
                         endDate,
                         startTime,
                         endTime);
-                request.setAttribute("meals", controller.getAll(startDate, endDate, startTime, endTime));
+                request.setAttribute("meals", controller.getAllFiltered(startDate, endDate, startTime, endTime));
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":

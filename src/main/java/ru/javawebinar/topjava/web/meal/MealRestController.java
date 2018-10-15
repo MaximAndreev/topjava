@@ -27,14 +27,14 @@ public class MealRestController {
 
     public List<MealWithExceed> getAll() {
         log.info("get all for user {}", authUserId());
-        return MealsUtil.getWithExceeded(service.getAll(authUserId(), LocalDate.MIN, LocalDate.MAX),
+        return MealsUtil.getWithExceeded(service.getAllFiltered(authUserId(), LocalDate.MIN, LocalDate.MAX),
                 authUserCaloriesPerDay());
     }
 
-    public List<MealWithExceed> getAll(LocalDate startDate,
-                                       LocalDate endDate,
-                                       LocalTime startTime,
-                                       LocalTime endTime) {
+    public List<MealWithExceed> getAllFiltered(LocalDate startDate,
+                                               LocalDate endDate,
+                                               LocalTime startTime,
+                                               LocalTime endTime) {
         log.info("get all for user {} / startDate {}, endDate {}, startTime {}, endTime {}",
                 authUserId(),
                 startDate,
@@ -42,17 +42,12 @@ public class MealRestController {
                 startTime,
                 endTime);
         return MealsUtil.getFilteredWithExceeded(
-                service.getAll(authUserId(),
+                service.getAllFiltered(authUserId(),
                         startDate != null ? startDate : LocalDate.MIN,
                         endDate != null ? endDate : LocalDate.MAX),
                 authUserCaloriesPerDay(),
                 startTime != null ? startTime : LocalTime.MIN,
                 endTime != null ? endTime : LocalTime.MAX);
-    }
-
-    public List<Meal> getAllWithoutFilter() {
-        log.info("get all without filter for user {}", authUserId());
-        return service.getAll(authUserId(), LocalDate.MIN, LocalDate.MAX);
     }
 
     public Meal get(int id) {

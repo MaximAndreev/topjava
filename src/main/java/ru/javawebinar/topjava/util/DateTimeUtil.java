@@ -20,17 +20,23 @@ public class DateTimeUtil {
     }
 
     public static LocalTime toLocalTime(String localTimeString) {
+        if (localTimeString == null) {
+            return null;
+        }
         try {
             return LocalTime.parse(localTimeString, TIME_FORMATTER);
-        } catch (NullPointerException | DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
 
     public static LocalDate toLocalDate(String localDateString) {
+        if (localDateString == null) {
+            return null;
+        }
         try {
             return LocalDate.parse(localDateString, DATE_FORMATTER);
-        } catch (NullPointerException | DateTimeParseException e) {
+        } catch (DateTimeParseException e) {
             return null;
         }
     }
