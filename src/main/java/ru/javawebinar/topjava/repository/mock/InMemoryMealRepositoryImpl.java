@@ -30,15 +30,12 @@ public class InMemoryMealRepositoryImpl implements MealRepository {
     @Override
     public Meal save(Meal meal) {
         log.info("save {}", meal);
+        Map<Integer, Meal> mealMap = repository.computeIfAbsent(meal.getUserId(), ConcurrentHashMap::new);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            Map<Integer, Meal> mealMap = repository.compute(meal.getUserId(),
-                    (key, map) -> map == null ? new ConcurrentHashMap<>() : map);
             mealMap.put(meal.getId(), meal);
             return meal;
         }
-        // update must check for consistency of userId
-        Map<Integer, Meal> mealMap = repository.getOrDefault(meal.getUserId(), Collections.emptyMap());
         return mealMap.get(meal.getId()) != null ? mealMap.put(meal.getId(), meal) : null;
     }
 
