@@ -1,8 +1,11 @@
 package ru.javawebinar.topjava.web;
 
 import org.junit.*;
+import org.junit.runner.RunWith;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepositoryImpl;
@@ -14,6 +17,8 @@ import java.util.Collection;
 
 import static ru.javawebinar.topjava.UserTestData.ADMIN;
 
+@ContextConfiguration(locations = {"classpath:spring/spring-app.xml", "classpath:spring/spring-db-test.xml"})
+@RunWith(SpringRunner.class)
 public class InMemoryAdminRestControllerTest {
     private static ConfigurableApplicationContext appCtx;
     private static AdminRestController controller;
