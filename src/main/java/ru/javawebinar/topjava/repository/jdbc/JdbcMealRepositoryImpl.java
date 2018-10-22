@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -66,11 +67,8 @@ public class JdbcMealRepositoryImpl implements MealRepository {
     @Override
     public Meal get(int id, int userId) {
         SqlParameterSource map = new MapSqlParameterSource().addValue("id", id).addValue("user_id", userId);
-        try {
-            return namedParameterJdbcTemplate.queryForObject("SELECT * FROM meals WHERE id=:id AND user_id=:user_id", map, ROW_MAPPER);
-        } catch (EmptyResultDataAccessException expected) {
-            return null;
-        }
+        List<Meal> meals = namedParameterJdbcTemplate.query("SELECT * FROM meals WHERE id=:id AND user_id=:user_id", map, ROW_MAPPER);
+        return DataAccessUtils.singleResult(meals);
     }
 
     @Override

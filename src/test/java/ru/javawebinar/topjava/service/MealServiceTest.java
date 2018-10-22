@@ -39,7 +39,7 @@ public class MealServiceTest {
 
     @Test
     public void get() {
-        assertMatch(service.get(100002, USER_ID), MEAL_1_USER);
+        assertMatch(service.get(MEAL_1_USER.getId(), USER_ID), MEAL_1_USER);
     }
 
     @Test(expected = NotFoundException.class)
@@ -54,7 +54,7 @@ public class MealServiceTest {
 
     @Test
     public void delete() {
-        service.delete(100003, USER_ID);
+        service.delete(MEAL_2_USER.getId(), USER_ID);
         assertMatch(service.getAll(USER_ID), MEAL_6_USER, MEAL_5_USER, MEAL_4_USER, MEAL_3_USER, MEAL_1_USER);
     }
 
@@ -110,9 +110,10 @@ public class MealServiceTest {
 
     @Test
     public void create() {
-        Meal meal = new Meal(LocalDateTime.of(2233, Month.MAY, 30, 12, 0), "завтра будущего", 9000);
+        Meal meal = new Meal(LocalDateTime.of(2233, Month.MAY, 30, 12, 0), "Завтрак будущего", 9000);
         Meal createdMeal = service.create(meal, USER_ID);
         meal.setId(createdMeal.getId());
         assertMatch(createdMeal, meal);
+        assertMatch(service.getAll(USER_ID), createdMeal, MEAL_6_USER, MEAL_5_USER, MEAL_4_USER, MEAL_3_USER, MEAL_2_USER, MEAL_1_USER);
     }
 }
