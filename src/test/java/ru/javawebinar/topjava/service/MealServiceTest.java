@@ -48,7 +48,7 @@ public class MealServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void getSomeoneElsesFood() {
+    public void getWithOtherUserId() {
         service.get(MEAL_5_ADMIN.getId(), USER_ID);
     }
 
@@ -64,7 +64,7 @@ public class MealServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void deleteSomeoneElsesFood() {
+    public void deleteWithOtherUserId() {
         service.delete(MEAL_5_ADMIN.getId(), USER_ID);
     }
 
@@ -104,7 +104,7 @@ public class MealServiceTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void updateSomeoneElsesFood() {
+    public void updateWithOtherUserId() {
         service.update(MEAL_6_ADMIN, USER_ID);
     }
 
