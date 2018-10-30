@@ -50,7 +50,7 @@ public class MealServiceTest {
 
         @Override
         protected void after() {
-            stopWatchLog.forEach(System.out::println);
+            log.info(String.join("\n", stopWatchLog));
         }
     };
 
@@ -63,7 +63,7 @@ public class MealServiceTest {
         protected void finished(long nanos, Description description) {
             long millis = TimeUnit.NANOSECONDS.toMillis(nanos);
             log.info("Spent {} milliseconds", millis);
-            stopWatchLog.add(String.format("Test %s finished, spent %s milliseconds", description.getMethodName(), millis));
+            stopWatchLog.add(description.getMethodName() + " - " + millis + " milliseconds");
         }
     };
 

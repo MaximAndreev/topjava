@@ -11,10 +11,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries(value = {
-        @NamedQuery(name = Meal.UPDATE, query = "" +
-                "UPDATE Meal m " +
-                "SET m.dateTime=:dateTime, m.description=:description, m.calories=:calories " +
-                "WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.ALL, query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"),
         @NamedQuery(name = Meal.ALL_BETWEEN, query = "" +
@@ -28,7 +24,6 @@ import java.time.LocalTime;
         uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "date_time"}, name = "meals_unique_user_datetime_idx")})
 public class Meal extends AbstractBaseEntity {
 
-    public static final String UPDATE = "Meal.update";
     public static final String DELETE = "Meal.delete";
     public static final String ALL = "Meal.getAll";
     public static final String ALL_BETWEEN = "Meal.getAllBetween";
