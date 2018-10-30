@@ -1,8 +1,8 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -19,6 +19,8 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -33,10 +35,24 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
+    private static List<String> stopWatchLog = new ArrayList<>();
 
     static {
         SLF4JBridgeHandler.install();
     }
+
+    @ClassRule
+    public static ExternalResource watchLog = new ExternalResource() {
+        @Override
+        protected void before() throws Throwable {
+            stopWatchLog.clear();
+        }
+
+        @Override
+        protected void after() {
+            stopWatchLog.forEach(System.out::println);
+        }
+    };
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -47,7 +63,7 @@ public class MealServiceTest {
         protected void finished(long nanos, Description description) {
             long millis = TimeUnit.NANOSECONDS.toMillis(nanos);
             log.info("Spent {} milliseconds", millis);
-            System.out.println(String.format("Test %s finished, spent %s milliseconds", description.getMethodName(), millis));
+            stopWatchLog.add(String.format("Test %s finished, spent %s milliseconds", description.getMethodName(), millis));
         }
     };
 
