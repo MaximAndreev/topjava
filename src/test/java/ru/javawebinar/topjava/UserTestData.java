@@ -15,18 +15,6 @@ public class UserTestData {
     public static final User USER = new User(USER_ID, "User", "user@yandex.ru", "password", Role.ROLE_USER);
     public static final User ADMIN = new User(ADMIN_ID, "Admin", "admin@gmail.com", "admin", Role.ROLE_ADMIN);
 
-    static {
-        USER.setMeals(List.of(
-                MealTestData.MEAL6,
-                MealTestData.MEAL5,
-                MealTestData.MEAL4,
-                MealTestData.MEAL3,
-                MealTestData.MEAL2,
-                MealTestData.MEAL1));
-
-        ADMIN.setMeals(List.of(MealTestData.ADMIN_MEAL2, MealTestData.ADMIN_MEAL1));
-    }
-
     public static void assertMatch(User actual, User expected) {
         assertThat(actual).isEqualToIgnoringGivenFields(expected, "registered", "roles", "meals");
     }

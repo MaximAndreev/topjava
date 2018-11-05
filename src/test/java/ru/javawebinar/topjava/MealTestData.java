@@ -33,7 +33,7 @@ public class MealTestData {
     }
 
     public static void assertMatch(Meal actual, Meal expected) {
-        assertThat(actual).isEqualToComparingOnlyGivenFields(expected, "dateTime", "description", "calories");
+        assertThat(actual).isEqualToComparingOnlyGivenFields(expected, "id", "dateTime", "description", "calories");
     }
 
     public static void assertMatch(Iterable<Meal> actual, Meal... expected) {

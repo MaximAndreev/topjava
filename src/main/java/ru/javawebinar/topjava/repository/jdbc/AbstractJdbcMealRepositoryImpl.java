@@ -19,23 +19,15 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
 
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
-    protected final JdbcTemplate jdbcTemplate;
-
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    private final SimpleJdbcInsert insertMeal;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public AbstractJdbcMealRepositoryImpl(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
-        this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("meals")
-                .usingGeneratedKeyColumns("id");
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-        this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
-    }
+    private SimpleJdbcInsert insertMeal;
 
-    protected abstract <T> Object getValidDate(T datetime);
+    protected abstract <T> Object getDbSpecificDate(T datetime);
 
     @Override
     public Meal save(Meal meal, int userId) {
@@ -43,9 +35,12 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", getValidDate(meal.getDateTime()))
+                .addValue("date_time", getDbSpecificDate(meal.getDateTime()))
                 .addValue("user_id", userId);
         if (meal.isNew()) {
+            if (insertMeal == null) {
+                initInsertMeal();
+            }
             Number newId = insertMeal.executeAndReturnKey(map);
             meal.setId(newId.intValue());
         } else {
@@ -81,6 +76,12 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, getValidDate(startDate), getValidDate(endDate));
+                ROW_MAPPER, userId, getDbSpecificDate(startDate), getDbSpecificDate(endDate));
+    }
+
+    private void initInsertMeal() {
+        insertMeal = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("meals")
+                .usingGeneratedKeyColumns("id");
     }
 }

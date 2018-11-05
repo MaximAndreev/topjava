@@ -1,18 +1,21 @@
-package ru.javawebinar.topjava.service;
+package ru.javawebinar.topjava.service.datajpa;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.test.context.ActiveProfiles;
 import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.service.AbstractUserServiceTest;
 
 import java.util.Collections;
 import java.util.Date;
 
-import static ru.javawebinar.topjava.MealTestData.assertMatch;
+import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.USER;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.UserTestData.assertMatch;
+import static ru.javawebinar.topjava.MealTestData.assertMatch;
 
 @ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaUserServiceTest extends AbstractUserServiceTest {
@@ -21,7 +24,7 @@ public class DataJpaUserServiceTest extends AbstractUserServiceTest {
     public void getAndCheckMeals() {
         User user = service.getWithMeal(USER_ID);
         assertMatch(user, USER);
-        assertMatch(user.getMeals(), USER.getMeals());
+        assertMatch(user.getMeals(), MEAL6, MEAL5, MEAL4, MEAL3, MEAL2, MEAL1);
     }
 
     @Test
@@ -30,6 +33,6 @@ public class DataJpaUserServiceTest extends AbstractUserServiceTest {
         newUser.setId(service.create(newUser).getId());
         User user = service.getWithMeal(newUser.getId());
         assertMatch(user, newUser);
-        assertMatch(user.getMeals(), newUser.getMeals());
+        Assert.assertTrue(user.getMeals().size() == 0);
     }
 }
