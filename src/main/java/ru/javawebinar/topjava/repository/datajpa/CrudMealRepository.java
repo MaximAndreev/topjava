@@ -28,6 +28,9 @@ public interface CrudMealRepository extends JpaRepository<Meal, Integer> {
         return meal != null && meal.getUser().getId() == userId ? meal : null;
     }
 
+    @Query("SELECT m from Meal m left join fetch m.user left join fetch m.user.roles where m.id=?1 and m.user.id=?2")
+    Meal getWithUser(int id, int userId);
+
     @Query(value = "SELECT m.user from Meal m where m.user.id=?1")
     User getUser(int userId);
 
