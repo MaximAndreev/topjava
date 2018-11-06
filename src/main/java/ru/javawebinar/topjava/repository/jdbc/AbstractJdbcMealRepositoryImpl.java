@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,7 +28,14 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
 
     private SimpleJdbcInsert insertMeal;
 
-    protected abstract <T> Object getDbSpecificDate(T datetime);
+    protected abstract <T> T getDbSpecificDate(LocalDateTime datetime);
+
+    @PostConstruct
+    private void initInsertMeal() {
+        insertMeal = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("meals")
+                .usingGeneratedKeyColumns("id");
+    }
 
     @Override
     public Meal save(Meal meal, int userId) {
@@ -38,9 +46,6 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
                 .addValue("date_time", getDbSpecificDate(meal.getDateTime()))
                 .addValue("user_id", userId);
         if (meal.isNew()) {
-            if (insertMeal == null) {
-                initInsertMeal();
-            }
             Number newId = insertMeal.executeAndReturnKey(map);
             meal.setId(newId.intValue());
         } else {
@@ -77,11 +82,5 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
         return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=?  AND date_time BETWEEN  ? AND ? ORDER BY date_time DESC",
                 ROW_MAPPER, userId, getDbSpecificDate(startDate), getDbSpecificDate(endDate));
-    }
-
-    private void initInsertMeal() {
-        insertMeal = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("meals")
-                .usingGeneratedKeyColumns("id");
     }
 }

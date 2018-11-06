@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class HsqldbJdbcMealRepositoryImpl extends AbstractJdbcMealRepositoryImpl {
 
     @Override
-    protected <T> Object getDbSpecificDate(T datetime) {
-        return Timestamp.valueOf((LocalDateTime) datetime);
+    protected Timestamp getDbSpecificDate(LocalDateTime datetime) {
+        return Timestamp.valueOf(datetime);
     }
 }
