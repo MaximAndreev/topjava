@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
+public abstract class AbstractJdbcMealRepositoryImpl<T> implements MealRepository {
 
     private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
@@ -28,7 +28,7 @@ public abstract class AbstractJdbcMealRepositoryImpl implements MealRepository {
 
     private SimpleJdbcInsert insertMeal;
 
-    protected abstract <T> T getDbSpecificDate(LocalDateTime datetime);
+    protected abstract T getDbSpecificDate(LocalDateTime datetime);
 
     @PostConstruct
     private void initInsertMeal() {
