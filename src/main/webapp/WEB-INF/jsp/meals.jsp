@@ -32,10 +32,7 @@
         <button type="submit"><spring:message code="meal.filter"/></button>
     </form>
     <hr/>
-    <form method="post">
-        <input type="hidden" name="action" value="create">
-        <button type="submit"><spring:message code="meal.add"/></button>
-    </form>
+    <a href="meals/create">Add Meal</a>
     <hr/>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -59,15 +56,13 @@
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>
-                    <form method="post" class="no_margin">
+                    <form method="post" action="meals/update" class="no_margin">
                         <input type="hidden" name="id" value="${meal.id}">
-                        <input type="hidden" name="action" value="update">
                         <button type="submit"><spring:message code="meal.update"/></button>
                     </form>
                 <td>
-                    <form method="post" class="no_margin">
+                    <form method="post" action="meals/delete" class="no_margin">
                         <input type="hidden" name="id" value="${meal.id}">
-                        <input type="hidden" name="action" value="delete">
                         <button type="submit"><spring:message code="meal.delete"/></button>
                     </form>
                 </td>

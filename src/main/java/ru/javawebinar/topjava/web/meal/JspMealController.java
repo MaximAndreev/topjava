@@ -31,19 +31,19 @@ public class JspMealController extends AbstractMealController {
         return "meals";
     }
 
-    @PostMapping(params = "action=delete")
+    @PostMapping("/delete")
     public String remove(@RequestParam("id") int id) {
         super.delete(id);
-        return "redirect:meals";
+        return "redirect:/meals";
     }
 
-    @PostMapping(params = "action=create")
+    @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("meal", new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000));
         return "mealForm";
     }
 
-    @PostMapping(params = "action=update")
+    @PostMapping("/update")
     public String update(@RequestParam("id") int id, Model model) {
         model.addAttribute("meal", super.get(id));
         return "mealForm";
@@ -53,7 +53,7 @@ public class JspMealController extends AbstractMealController {
     public String save(HttpServletRequest request) {
         String idAsString = request.getParameter("id");
         Meal meal = new Meal(
-                idAsString != null ? Integer.parseInt(idAsString) : null,
+                idAsString == null || idAsString.isEmpty() ? null : Integer.parseInt(idAsString),
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
