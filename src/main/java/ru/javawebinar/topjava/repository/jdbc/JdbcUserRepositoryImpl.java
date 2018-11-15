@@ -33,16 +33,8 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             Collections.singleton(Role.valueOf(rs.getString("role"))));
 
     private static final BiFunction<User, User, User> USER_MERGER = (u1, u2) -> {
-        Set<Role> roles = EnumSet.copyOf(u1.getRoles());
-        roles.addAll(u2.getRoles());
-        return new User(u1.getId(),
-                u1.getName(),
-                u1.getEmail(),
-                u1.getPassword(),
-                u1.getCaloriesPerDay(),
-                u1.isEnabled(),
-                u1.getRegistered(),
-                roles);
+        u1.getRoles().addAll(u2.getRoles());
+        return u1;
     };
 
     private final JdbcTemplate jdbcTemplate;

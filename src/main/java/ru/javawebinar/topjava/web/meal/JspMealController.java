@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,14 +7,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.web.meal.AbstractMealController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
@@ -53,15 +51,17 @@ public class JspMealController extends AbstractMealController {
 
     @PostMapping
     public String save(HttpServletRequest request) {
+        String idAsString = request.getParameter("id");
         Meal meal = new Meal(
+                idAsString != null ? Integer.parseInt(idAsString) : null,
                 LocalDateTime.parse(request.getParameter("dateTime")),
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
-        String idAsString = request.getParameter("id");
-        if (idAsString.isEmpty()) {
+
+        if (meal.isNew()) {
             super.create(meal);
         } else {
-            super.update(meal, Integer.parseInt(Objects.requireNonNull(idAsString)));
+            super.update(meal, meal.getId());
         }
         return "redirect:meals";
     }
