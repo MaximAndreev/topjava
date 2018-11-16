@@ -21,7 +21,7 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 @RequestMapping(value = "/meals")
 public class JspMealController extends AbstractMealController {
 
-    @PostMapping(params = "action=filter")
+    @PostMapping("/filter")
     public String filter(HttpServletRequest request, Model model) {
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));

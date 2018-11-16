@@ -10,9 +10,9 @@
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
+    <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
     <h3><spring:message code="meal.title"/></h3>
-    <form method="post">
-        <input type="hidden" name="action" value="filter">
+    <form method="post" action="${contextPath}${"/meals/filter"}">
         <dl>
             <dt><spring:message code="meal.date.from"/>:</dt>
             <dd><input type="date" name="startDate" value="${param.startDate}"></dd>
@@ -32,7 +32,7 @@
         <button type="submit"><spring:message code="meal.filter"/></button>
     </form>
     <hr/>
-    <a href="meals/create">Add Meal</a>
+    <a href="${contextPath}${"/meals/create"}">Add Meal</a>
     <hr/>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
@@ -56,12 +56,12 @@
                 <td>${meal.description}</td>
                 <td>${meal.calories}</td>
                 <td>
-                    <form method="post" action="meals/update" class="no_margin">
+                    <form method="post" action="${contextPath}${"/meals/update"}" class="no_margin">
                         <input type="hidden" name="id" value="${meal.id}">
                         <button type="submit"><spring:message code="meal.update"/></button>
                     </form>
                 <td>
-                    <form method="post" action="meals/delete" class="no_margin">
+                    <form method="post" action="${contextPath}${"/meals/delete"}" class="no_margin">
                         <input type="hidden" name="id" value="${meal.id}">
                         <button type="submit"><spring:message code="meal.delete"/></button>
                     </form>

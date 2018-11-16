@@ -8,13 +8,14 @@
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
-    <h3><a href="${pageContext.request.contextPath}"><spring:message code="app.home"/></a></h3>
+    <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+    <h3><a href="${contextPath}"><spring:message code="app.home"/></a></h3>
     <spring:message code="meal.form.edit.title" var="edit"/>
     <spring:message code="meal.form.add.title" var="add"/>
     <h2>${param.action == 'create' ? add : edit}</h2>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
-    <form method="post" action="${pageContext.request.contextPath}${"/meals"}">
+    <form method="post" action="${contextPath}${"/meals"}">
         <input type="hidden" name="id" value="${meal.id}">
         <dl>
             <dt><spring:message code="meal.date"/>:</dt>
