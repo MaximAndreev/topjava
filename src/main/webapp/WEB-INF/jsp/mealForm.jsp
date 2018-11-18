@@ -12,7 +12,7 @@
     <h3><a href="${contextPath}"><spring:message code="app.home"/></a></h3>
     <spring:message code="meal.form.edit.title" var="edit"/>
     <spring:message code="meal.form.add.title" var="add"/>
-    <h2>${param.action == 'create' ? add : edit}</h2>
+    <h2>${meal.id == null ? add : edit}</h2>
     <hr>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <form method="post" action="${contextPath}${"/meals"}">
