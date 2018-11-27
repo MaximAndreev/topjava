@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.TestUtil.readFromJson;
 import static ru.javawebinar.topjava.TestUtil.readListFromJson;
+import static ru.javawebinar.topjava.TestUtil.contentJson;
 
 
 class MealRestControllerTest extends AbstractControllerTest {
@@ -78,7 +79,20 @@ class MealRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    void testGetBetweenAll() throws Exception {
+    void testGetAll() throws Exception {
+        ResultActions action = mockMvc.perform(get(REST_URL));
+        List<MealTo> actual = readListFromJson(action, MealTo.class);
+        assertMatch(actual,
+                MealsUtil.createWithExcess(MEAL6, true),
+                MealsUtil.createWithExcess(MEAL5, true),
+                MealsUtil.createWithExcess(MEAL4, true),
+                MealsUtil.createWithExcess(MEAL3, false),
+                MealsUtil.createWithExcess(MEAL2, false),
+                MealsUtil.createWithExcess(MEAL1, false));
+    }
+
+    @Test
+    void testGetBetweenAllFullParams() throws Exception {
         LocalDateTime start = LocalDateTime.of(2015, 5, 30, 20, 0);
         LocalDateTime end = LocalDateTime.of(2015, 6, 30, 20, 0);
         ResultActions action = mockMvc.perform(get(REST_URL + "?" + datesToParams(
@@ -88,7 +102,52 @@ class MealRestControllerTest extends AbstractControllerTest {
                 end.toLocalTime()
         )));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual, MealsUtil.createWithExcess(MEAL6, true), MealsUtil.createWithExcess(MEAL3, false));
+        assertMatch(actual,
+                MealsUtil.createWithExcess(MEAL6, true),
+                MealsUtil.createWithExcess(MEAL3, false));
+    }
+
+    @Test
+    void testGetBetweenAllOnlyDate() throws Exception {
+        ResultActions action = mockMvc.perform(get(REST_URL + "?" + datesToParams(
+                LocalDate.of(2015, 5, 30),
+                null,
+                LocalDate.of(2015, 5, 30),
+                null
+        )));
+        List<MealTo> actual = readListFromJson(action, MealTo.class);
+        assertMatch(actual,
+                MealsUtil.createWithExcess(MEAL3, false),
+                MealsUtil.createWithExcess(MEAL2, false),
+                MealsUtil.createWithExcess(MEAL1, false));
+    }
+
+    @Test
+    void testGetBetweenAllOnlyTime() throws Exception {
+        ResultActions action = mockMvc.perform(get(REST_URL + "?" + datesToParams(
+                null,
+                LocalTime.of(9, 40, 20),
+                null,
+                LocalTime.of(18, 0)
+        )));
+        List<MealTo> actual = readListFromJson(action, MealTo.class);
+        assertMatch(actual,
+                MealsUtil.createWithExcess(MEAL5, true),
+                MealsUtil.createWithExcess(MEAL4, true),
+                MealsUtil.createWithExcess(MEAL2, false),
+                MealsUtil.createWithExcess(MEAL1, false));
+    }
+
+    @Test
+    void testGetBetweenAllHalfDateHalfTime() throws Exception {
+        ResultActions action = mockMvc.perform(get(REST_URL + "?" + datesToParams(
+                null,
+                LocalTime.of(14, 0),
+                LocalDate.of(2015, 5, 30),
+                null
+        )));
+        List<MealTo> actual = readListFromJson(action, MealTo.class);
+        assertMatch(actual, MealsUtil.createWithExcess(MEAL3, false));
     }
 
     private static String datesToParams(LocalDate startDate,
