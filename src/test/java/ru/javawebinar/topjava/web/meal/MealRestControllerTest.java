@@ -18,8 +18,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -82,13 +84,13 @@ class MealRestControllerTest extends AbstractControllerTest {
     void testGetAll() throws Exception {
         ResultActions action = mockMvc.perform(get(REST_URL));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual,
+        assertEquals(actual, List.of(
                 MealsUtil.createWithExcess(MEAL6, true),
                 MealsUtil.createWithExcess(MEAL5, true),
                 MealsUtil.createWithExcess(MEAL4, true),
                 MealsUtil.createWithExcess(MEAL3, false),
                 MealsUtil.createWithExcess(MEAL2, false),
-                MealsUtil.createWithExcess(MEAL1, false));
+                MealsUtil.createWithExcess(MEAL1, false)));
     }
 
     @Test
@@ -102,9 +104,9 @@ class MealRestControllerTest extends AbstractControllerTest {
                 end.toLocalTime()
         )));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual,
+        assertEquals(actual, List.of(
                 MealsUtil.createWithExcess(MEAL6, true),
-                MealsUtil.createWithExcess(MEAL3, false));
+                MealsUtil.createWithExcess(MEAL3, false)));
     }
 
     @Test
@@ -116,10 +118,10 @@ class MealRestControllerTest extends AbstractControllerTest {
                 null
         )));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual,
+        assertEquals(actual, List.of(
                 MealsUtil.createWithExcess(MEAL3, false),
                 MealsUtil.createWithExcess(MEAL2, false),
-                MealsUtil.createWithExcess(MEAL1, false));
+                MealsUtil.createWithExcess(MEAL1, false)));
     }
 
     @Test
@@ -131,11 +133,11 @@ class MealRestControllerTest extends AbstractControllerTest {
                 LocalTime.of(18, 0)
         )));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual,
+        assertEquals(actual, List.of(
                 MealsUtil.createWithExcess(MEAL5, true),
                 MealsUtil.createWithExcess(MEAL4, true),
                 MealsUtil.createWithExcess(MEAL2, false),
-                MealsUtil.createWithExcess(MEAL1, false));
+                MealsUtil.createWithExcess(MEAL1, false)));
     }
 
     @Test
@@ -147,7 +149,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 null
         )));
         List<MealTo> actual = readListFromJson(action, MealTo.class);
-        assertMatch(actual, MealsUtil.createWithExcess(MEAL3, false));
+        assertEquals(actual, Collections.singletonList(MealsUtil.createWithExcess(MEAL3, false)));
     }
 
     private static String datesToParams(LocalDate startDate,
