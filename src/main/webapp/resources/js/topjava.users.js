@@ -41,15 +41,24 @@ $(function () {
     makeEditable();
 });
 
+function getFilterUrl() {
+    return ajaxUrl;
+}
+
 function disable(id) {
     let checkbox = $("#enabled-" + id);
-    let enabled = checkbox[0].checked;
+    let enable = checkbox[0].checked === true;
     $.ajax({
         url: ajaxUrl + id,
         type: "PUT",
-        data: "enabled=" + enabled
+        data: "enabled=" + enable
     }).done(function () {
-        updateTable();
-        successNoty(enabled ? "Enabled" : "Disabled");
+        if (enable) {
+            $("#row-" + id).removeClass("text-muted");
+            successNoty("Enabled");
+        } else {
+            $("#row-" + id).addClass("text-muted");
+            successNoty("Disabled");
+        }
     });
 }

@@ -22,5 +22,5 @@ public interface UserService {
 
     User getWithMeals(int id);
 
-    User setEnabled(int id, boolean enabled);
+    void setEnabled(int id, boolean enabled);
 }

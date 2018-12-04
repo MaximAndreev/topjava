@@ -17,13 +17,13 @@ function deleteRow(id) {
         url: ajaxUrl + id,
         type: "DELETE"
     }).done(function () {
-        updateTable();
+        updateTable(getFilterUrl());
         successNoty("Deleted");
     });
 }
 
-function updateTable() {
-    $.get(ajaxUrl, function (data) {
+function updateTable(urlToAsk) {
+    $.get(urlToAsk, function (data) {
         datatableApi.clear().rows.add(data).draw();
     });
 }
@@ -36,7 +36,7 @@ function save() {
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        updateTable(getFilterUrl());
         successNoty("Saved");
     });
 }

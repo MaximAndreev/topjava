@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,8 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Test
     void setEnabled() throws Exception  {
-        User user = service.setEnabled(USER_ID, false);
-        assertMatch(service.get(user.getId()), user);
+        service.setEnabled(USER_ID, false);
+        User user = service.get(USER_ID);
+        Assertions.assertFalse(user.isEnabled());
     }
 }

@@ -35,15 +35,15 @@ $(function () {
     makeEditable();
 });
 
-function updateTable() {
-    let form = $("#filterTable");
-    $.get(ajaxUrl + "filter?" + form.serialize(), function (data) {
-        datatableApi.clear().rows.add(data).draw();
-    });
+function getFilterUrl() {
+    return ajaxUrl + "filter?" + $("#filterTable").serialize();
+}
+
+function filter() {
+    updateTable(getFilterUrl())
 }
 
 function clearFilter() {
-    let form = $("#filterTable");
-    form[0].reset();
-    updateTable();
+    $("#filterTable")[0].reset();
+    updateTable(ajaxUrl);
 }

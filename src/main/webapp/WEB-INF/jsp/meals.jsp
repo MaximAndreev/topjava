@@ -8,7 +8,7 @@
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <script type="text/javascript" src="resources/js/topjava.common.js" defer></script>
-<script type="text/javascript" src="resources/js/mealDatatables.js" defer></script>
+<script type="text/javascript" src="resources/js/topjava.meals.js" defer></script>
 
 <div class="jumbotron pt-4">
     <div class="container">
@@ -17,31 +17,31 @@
         <form method="get" id="filterTable">
             <div class="form-group row">
                 <label for="startDate" class="col-2 col-form-label"><spring:message code="meal.startDate"/>:</label>
-                <div class="col-3">
+                <div class="col-2">
                     <input class="form-control" type="date" name="startDate" id="startDate" value="${param.startDate}">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="endDate" class="col-2 col-form-label"><spring:message code="meal.endDate"/>:</label>
-                <div class="col-3">
+                <div class="col-2">
                     <input class="form-control" type="date" name="endDate" id="endDate" value="${param.endDate}">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="startTime" class="col-2 col-form-label"><spring:message code="meal.startTime"/>:</label>
-                <div class="col-3">
+                <div class="col-2">
                     <input class="form-control" type="time" name="startTime" id="startTime" value="${param.startTime}">
                 </div>
             </div>
             <div class="form-group row">
                 <label for="endTime" class="col-2 col-form-label"><spring:message code="meal.endTime"/>:</label>
-                <div class="col-3">
+                <div class="col-2">
                     <input class="form-control" type="time" name="endTime" id="endTime"
                            value="${param.endTime}">
                 </div>
             </div>
         </form>
-        <button class="btn btn-primary" onclick="updateTable()">
+        <button class="btn btn-primary" onclick="filter()">
             <spring:message code="meal.filter"/>
         </button>
         <button class="btn btn-info" onclick="clearFilter()">
