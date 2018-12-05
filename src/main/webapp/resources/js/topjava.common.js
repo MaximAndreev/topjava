@@ -22,8 +22,8 @@ function deleteRow(id) {
     });
 }
 
-function updateTable(urlToAsk) {
-    $.get(urlToAsk, function (data) {
+function updateTable(url) {
+    $.get(url, function (data) {
         datatableApi.clear().rows.add(data).draw();
     });
 }

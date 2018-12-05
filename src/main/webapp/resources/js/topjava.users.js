@@ -49,16 +49,11 @@ function disable(id) {
     let checkbox = $("#enabled-" + id);
     let enable = checkbox[0].checked === true;
     $.ajax({
-        url: ajaxUrl + id,
-        type: "PUT",
-        data: "enabled=" + enable
+        url: ajaxUrl + id + "?enabled=" + enable,
+        type: "PUT"
     }).done(function () {
-        if (enable) {
-            $("#row-" + id).removeClass("text-muted");
-            successNoty("Enabled");
-        } else {
-            $("#row-" + id).addClass("text-muted");
-            successNoty("Disabled");
-        }
+        let row = $("#row-" + id);
+        enable ? row.removeClass("text-muted") : row.addClass("text-muted");
+        successNoty(enable ? "Enabled" : "Disabled");
     });
 }

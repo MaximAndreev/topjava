@@ -49,7 +49,7 @@ public abstract class AbstractUserController {
         return service.getByEmail(email);
     }
 
-    public void setEnabled(int id, Boolean enabled) {
+    public void setEnabled(int id, boolean enabled) {
         log.info("for {} set setEnabled to {}", id, enabled);
         service.setEnabled(id, enabled);
     }
