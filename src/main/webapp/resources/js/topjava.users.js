@@ -47,7 +47,7 @@ function getFilterUrl() {
 
 function disable(id) {
     let checkbox = $("#enabled-" + id);
-    let enable = checkbox[0].checked === true;
+    let enable = checkbox.is(":checked");
     $.ajax({
         url: ajaxUrl + id + "?enabled=" + enable,
         type: "PUT"
@@ -55,5 +55,7 @@ function disable(id) {
         let row = $("#row-" + id);
         enable ? row.removeClass("text-muted") : row.addClass("text-muted");
         successNoty(enable ? "Enabled" : "Disabled");
+    }).fail(function () {
+        enable ? checkbox.prop('checked', false) : checkbox.prop('checked', true);
     });
 }
