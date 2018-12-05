@@ -56,6 +56,6 @@ function disable(id) {
         enable ? row.removeClass("text-muted") : row.addClass("text-muted");
         successNoty(enable ? "Enabled" : "Disabled");
     }).fail(function () {
-        enable ? checkbox.prop('checked', false) : checkbox.prop('checked', true);
+         checkbox.prop('checked', !enable);
     });
 }
