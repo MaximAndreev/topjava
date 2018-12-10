@@ -45,7 +45,8 @@ function save() {
     $.ajax({
         type: "POST",
         url: context.ajaxUrl,
-        data: form.serialize()
+        // May be possible to use converter for x-www-form-urlencoded instead of replace
+        data: form.serialize().replace(/dateTime=(\d+-\d+-\d+)%20(\d+%3A\d+)/, "dateTime=$1T$2:00")
     }).done(function () {
         $("#editRow").modal("hide");
         context.updateTable();
