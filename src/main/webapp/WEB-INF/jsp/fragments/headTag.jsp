@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="webjars/datatables/1.10.19/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="webjars/noty/3.1.4/lib/noty.css"/>
     <link rel="shortcut icon" href="resources/images/icon-meal.png">
-    <link rel="stylesheet" type="text/css" href="resources/js/datetimepicker/jquery.datetimepicker.css">
+    <%--<link rel="stylesheet" type="text/css" href="resources/js/datetimepicker/jquery.datetimepicker.css">--%>
+    <link rel="stylesheet" type="text/css" href="webjars/datetimepicker/2.5.20/jquery.datetimepicker.css">
 
     <%--http://stackoverflow.com/a/24070373/548473--%>
     <script type="text/javascript" src="webjars/jquery/3.3.1-1/jquery.min.js" defer></script>
@@ -21,5 +22,6 @@
     <script type="text/javascript" src="webjars/datatables/1.10.19/js/jquery.dataTables.min.js" defer></script>
     <script type="text/javascript" src="webjars/datatables/1.10.19/js/dataTables.bootstrap4.min.js" defer></script>
     <script type="text/javascript" src="webjars/noty/3.1.4/lib/noty.min.js" defer></script>
-    <script src="resources/js/datetimepicker/build/jquery.datetimepicker.full.min.js" defer></script>
+    <%--<script src="resources/js/datetimepicker/build/jquery.datetimepicker.full.min.js" defer></script>--%>
+    <script src="webjars/datetimepicker/2.5.20/build/jquery.datetimepicker.full.min.js" defer></script>
 </head>

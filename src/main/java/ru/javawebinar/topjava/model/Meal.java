@@ -29,16 +29,16 @@ public class Meal extends AbstractBaseEntity {
     public static final String GET_BETWEEN = "Meal.getBetween";
 
     @Column(name = "date_time", nullable = false)
-    @NotNull
+    @NotNull(groups = MealUiChecks.class)
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
-    @NotBlank
-    @Size(min = 2, max = 120)
+    @NotBlank(groups = MealUiChecks.class)
+    @Size(min = 2, max = 120, groups = MealUiChecks.class)
     private String description;
 
     @Column(name = "calories", nullable = false)
-    @Range(min = 10, max = 5000)
+    @Range(min = 10, max = 5000, groups = MealUiChecks.class)
     private int calories;
 
     @ManyToOne(fetch = FetchType.LAZY)

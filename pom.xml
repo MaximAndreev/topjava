@@ -46,6 +46,7 @@
         <webjars-datetimepicker.version>2.5.20</webjars-datetimepicker.version>
         <webjars-noty.version>3.1.4</webjars-noty.version>
         <webjars-datatables.version>1.10.19</webjars-datatables.version>
+        <datetimepicker.version>2.5.20</datetimepicker.version>
     </properties>
 
     <build>
@@ -273,6 +274,11 @@
             <groupId>org.webjars.bower</groupId>
             <artifactId>noty</artifactId>
             <version>${webjars-noty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>datetimepicker</artifactId>
+            <version>${datetimepicker.version}</version>
         </dependency>
 
         <!--JSON-->
