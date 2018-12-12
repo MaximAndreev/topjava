@@ -4,21 +4,14 @@ $.ajaxSetup({
     converters: {
         "text json": function (result) {
             var json = JSON.parse(result);
-            if (Array.isArray(json)) {
-                $.each(json, function (i, item) {
-                    json[i].dateTime = isoDateTimeToUiDateTime(item.dateTime);
-                });
-            } else if (json.hasOwnProperty('dateTime')) {
-                json.dateTime = isoDateTimeToUiDateTime(json.dateTime);
-            }
+            // Casting to a jQquery object prevents from iteration over non-object types
+            $(json).each(function (index, element) {
+                element.dateTime = element.dateTime.replace('T', ' ').substr(0, 16);
+            });
             return json;
         }
     }
 });
-
-function isoDateTimeToUiDateTime(str) {
-    return str.replace('T', ' ').substring(0, 16);
-}
 
 function updateFilteredTable() {
     $.ajax({
