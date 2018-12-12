@@ -88,7 +88,8 @@
                     <entry key="#{T(org.hibernate.cfg.AvailableSettings).USE_QUERY_CACHE}" value="false"/> <!--default-->
                     <entry key="#{T(org.hibernate.cfg.AvailableSettings).JPA_PERSIST_VALIDATION_GROUP}"
                            value="javax.validation.groups.Default, ru.javawebinar.topjava.model.MealUiChecks"/>
-
+                    <entry key="#{T(org.hibernate.cfg.AvailableSettings).JPA_UPDATE_VALIDATION_GROUP}"
+                           value="javax.validation.groups.Default, ru.javawebinar.topjava.model.MealUiChecks"/>
 <!--
                     <entry key="#{T(org.hibernate.cfg.AvailableSettings).HBM2DDL_SCRIPTS_ACTION}" value="drop-and-create"/>
                     <entry key="#{T(org.hibernate.cfg.AvailableSettings).HBM2DDL_SCRIPTS_CREATE_TARGET}" value="${TOPJAVA_ROOT}/config/ddl/create.ddl"/>

@@ -5,13 +5,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealUiChecks;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.web.ValidationUtil;
-import ru.javawebinar.topjava.web.editor.StringToPrimitiveNumber;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,11 +18,6 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/ajax/profile/meals")
 public class MealAjaxController extends AbstractMealController {
-
-    @InitBinder
-    public void registerBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(int.class, new StringToPrimitiveNumber(Integer.class));
-    }
 
     @Override
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
