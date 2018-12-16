@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -7,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,9 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.validation.BindException;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -46,6 +51,20 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
     }
 
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ErrorInfo notValidDataErrorRest(HttpServletRequest req, MethodArgumentNotValidException e) {
+        List<String> details = ValidationUtil.readErrorMessages(e.getBindingResult());
+        return doLogAndGetErrorInfo(req, new IllegalRequestDataException("invalid data"), true, VALIDATION_ERROR, details);
+    }
+
+    @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
+    @ExceptionHandler(BindException.class)
+    public ErrorInfo notValidDataErrorRestAjax(HttpServletRequest req, BindException e) {
+        List<String> details = ValidationUtil.readErrorMessages(e.getBindingResult());
+        return doLogAndGetErrorInfo(req, new IllegalRequestDataException("invalid data"), true, VALIDATION_ERROR, details);
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorInfo handleError(HttpServletRequest req, Exception e) {
@@ -55,11 +74,17 @@ public class ExceptionInfoHandler {
 //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
     private static ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
         Throwable rootCause = ValidationUtil.getRootCause(e);
-        if (logException) {
-            log.error(errorType + " at request " + req.getRequestURL(), rootCause);
-        } else {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
-        }
-        return new ErrorInfo(req.getRequestURL(), errorType, ValidationUtil.getMessage(rootCause));
+        return doLogAndGetErrorInfo(req, e, logException, errorType, List.of(ValidationUtil.getMessage(rootCause)));
     }
+
+    private static ErrorInfo doLogAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType, List<String> details) {
+        if (logException) {
+            log.error(errorType + " at request " + req.getRequestURL(), e);
+        } else {
+            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), e.toString());
+        }
+        return new ErrorInfo(req.getRequestURL(), errorType, details);
+    }
+
+
 }

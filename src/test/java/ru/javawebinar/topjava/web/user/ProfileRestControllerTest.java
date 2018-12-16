@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -7,8 +8,12 @@ import ru.javawebinar.topjava.TestUtil;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -16,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.TestUtil.*;
 import static ru.javawebinar.topjava.UserTestData.*;
+import static ru.javawebinar.topjava.util.exception.ErrorType.VALIDATION_ERROR;
 import static ru.javawebinar.topjava.web.user.ProfileRestController.REST_URL;
 
 class ProfileRestControllerTest extends AbstractControllerTest {
@@ -63,6 +69,60 @@ class ProfileRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void testRegisterBadEmail() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + "/register",
+                VALIDATION_ERROR,
+                List.of("email must be a well-formed email address"));
+        UserTo createdTo = new UserTo(null, "newName", "not_a_mail", "newPassword", 1500);
+
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register").contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(createdTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
+    }
+
+    @Test
+    void testRegisterShortName() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + "/register",
+                VALIDATION_ERROR,
+                List.of("name size must be between 2 and 100"));
+        UserTo createdTo = new UserTo(null, "U", "newemail@ya.ru", "newPassword", 1500);
+
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register").contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(createdTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
+    }
+
+    @Test
+    void testRegisterShortPassword() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + "/register",
+                VALIDATION_ERROR,
+                List.of("password length must between 5 and 32 characters"));
+        UserTo createdTo = new UserTo(null, "newName", "newemail@ya.ru", "shrt", 1500);
+
+        ResultActions action = mockMvc.perform(post(REST_URL + "/register").contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(createdTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
+    }
+
+    @Test
     void testUpdate() throws Exception {
         UserTo updatedTo = new UserTo(null, "newName", "newemail@ya.ru", "newPassword", 1500);
 
@@ -73,5 +133,62 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         assertMatch(userService.getByEmail("newemail@ya.ru"), UserUtil.updateFromTo(new User(USER), updatedTo));
+    }
+
+    @Test
+    void testUpdateBadEmail() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("email must be a well-formed email address"));
+        UserTo updatedTo = new UserTo(null, "newName", "not_a_e_mail", "newPassword", 1500);
+
+        ResultActions action = mockMvc.perform(put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(userService.getByEmail(USER.getEmail()), USER);
+    }
+
+    @Test
+    void testUpdateShortPassword() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("password length must between 5 and 32 characters"));
+        UserTo updatedTo = new UserTo(null, "newName", "newemail@ya.ru", "shrt", 1500);
+
+        ResultActions action = mockMvc.perform(put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(userService.getByEmail(USER.getEmail()), USER);
+    }
+
+    @Test
+    void testUpdateShortName() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("name size must be between 2 and 100"));
+        UserTo updatedTo = new UserTo(null, "N", "newemail@ya.ru", "newPassword", 1500);
+
+        ResultActions action = mockMvc.perform(put(REST_URL).contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(userService.getByEmail(USER.getEmail()), USER);
     }
 }

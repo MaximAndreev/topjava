@@ -1,14 +1,18 @@
 package ru.javawebinar.topjava.web.meal;
 
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.util.exception.ErrorInfo;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,6 +24,7 @@ import static ru.javawebinar.topjava.UserTestData.*;
 import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 import static ru.javawebinar.topjava.util.MealsUtil.createWithExcess;
 import static ru.javawebinar.topjava.util.MealsUtil.getWithExcess;
+import static ru.javawebinar.topjava.util.exception.ErrorType.VALIDATION_ERROR;
 
 class MealRestControllerTest extends AbstractControllerTest {
 
@@ -79,6 +84,66 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
 
         assertMatch(service.get(MEAL1_ID, START_SEQ), updated);
+    }
+
+    @Test
+    void testUpdateShortDescription() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + MEAL1_ID,
+                VALIDATION_ERROR,
+                List.of("description size must be between 2 and 120"));
+        Meal updated = getUpdated();
+        updated.setDescription("D");
+
+        ResultActions action = mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    void testUpdateLowCalories() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + MEAL1_ID,
+                VALIDATION_ERROR,
+                List.of("calories must be between 10 and 5000"));
+        Meal updated = getUpdated();
+        updated.setCalories(1);
+
+        ResultActions action = mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    void testUpdateEmptyDateTime() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + MEAL1_ID,
+                VALIDATION_ERROR,
+                List.of("dateTime must not be null"));
+        Meal updated = getUpdated();
+        updated.setDateTime(null);
+
+        ResultActions action = mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        Assertions.assertEquals(expected, returned);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
     }
 
     @Test

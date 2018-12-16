@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.web.user.AbstractUserController;
 
 import javax.validation.Valid;
@@ -46,14 +47,17 @@ public class RootController extends AbstractUserController {
 
     @PostMapping("/profile")
     public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
-        if (result.hasErrors()) {
-            return "profile";
-        } else {
-            super.update(userTo, SecurityUtil.authUserId());
-            SecurityUtil.get().update(userTo);
-            status.setComplete();
-            return "redirect:meals";
+        if (!result.hasErrors()) {
+            try {
+                super.update(userTo, SecurityUtil.authUserId());
+                SecurityUtil.get().update(userTo);
+                status.setComplete();
+                return "redirect:meals";
+            } catch (IllegalRequestDataException e) {
+                result.rejectValue("email", "user.error.duplicateEmail");
+            }
         }
+        return "profile";
     }
 
     @GetMapping("/register")
