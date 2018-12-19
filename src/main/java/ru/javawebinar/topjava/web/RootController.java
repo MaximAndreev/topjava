@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.support.SessionStatus;
 import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
-import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.web.user.AbstractUserController;
 
 import javax.validation.Valid;
@@ -53,7 +53,7 @@ public class RootController extends AbstractUserController {
                 SecurityUtil.get().update(userTo);
                 status.setComplete();
                 return "redirect:meals";
-            } catch (IllegalRequestDataException e) {
+            } catch (DataIntegrityViolationException e) {
                 result.rejectValue("email", "user.error.duplicateEmail");
             }
         }
@@ -69,13 +69,16 @@ public class RootController extends AbstractUserController {
 
     @PostMapping("/register")
     public String saveRegister(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
-        if (result.hasErrors()) {
-            model.addAttribute("register", true);
-            return "profile";
-        } else {
-            super.create(UserUtil.createNewFromTo(userTo));
-            status.setComplete();
-            return "redirect:login?message=app.registered&username=" + userTo.getEmail();
+        if (!result.hasErrors()) {
+            try {
+                super.create(UserUtil.createNewFromTo(userTo));
+                status.setComplete();
+                return "redirect:login?message=app.registered&username=" + userTo.getEmail();
+            } catch (DataIntegrityViolationException e) {
+                result.rejectValue("email", "user.error.duplicateEmail");
+            }
         }
+        model.addAttribute("register", true);
+        return "profile";
     }
 }

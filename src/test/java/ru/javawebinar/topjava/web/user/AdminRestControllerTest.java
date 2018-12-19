@@ -1,9 +1,10 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.TestUtil;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -12,7 +13,9 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -114,7 +117,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 
@@ -134,20 +137,20 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 
     @Test
     void testUpdateShortName() throws Exception {
         ErrorInfo expected = new ErrorInfo(
-                "http://localhost" + REST_URL,
+                "http://localhost" + REST_URL + USER_ID,
                 VALIDATION_ERROR,
                 List.of("name size must be between 2 and 100"));
         User updated = new User(USER);
         updated.setName("U");
 
-        ResultActions action = mockMvc.perform(post(REST_URL)
+        ResultActions action = mockMvc.perform(put(REST_URL + USER_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(userHttpBasic(ADMIN))
                 .content(jsonWithPassword(updated, updated.getPassword())))
@@ -155,7 +158,29 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(userService.getAll(), ADMIN, USER);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testUpdateDuplicateEmail() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + USER_ID,
+                VALIDATION_ERROR,
+                List.of(messageSource.getMessage("user.error.duplicateEmail", new Object[]{}, Locale.ENGLISH)));
+        User updated = new User(USER);
+        updated.setEmail(ADMIN.getEmail());
+
+        ResultActions action = mockMvc.perform(put(REST_URL + USER_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(updated, updated.getPassword())))
+                .andExpect(status().isUnprocessableEntity());
+
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 
@@ -190,7 +215,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 
@@ -209,7 +234,7 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 
@@ -228,7 +253,28 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(userService.getAll(), ADMIN, USER);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testCreateDuplicateEmail() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of(messageSource.getMessage("user.error.duplicateEmail", new Object[]{}, Locale.ENGLISH)));
+        User updated = new User(null, "NewUser", USER.getEmail(), "newPass", 2300, Role.ROLE_USER, Role.ROLE_ADMIN);
+
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(ADMIN))
+                .content(jsonWithPassword(updated, updated.getPassword())))
+                .andExpect(status().isUnprocessableEntity());
+
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getAll(), ADMIN, USER);
     }
 

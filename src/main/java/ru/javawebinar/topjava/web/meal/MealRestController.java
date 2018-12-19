@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.to.MealTo;
+import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -38,17 +41,27 @@ public class MealRestController extends AbstractMealController {
         return super.getAll();
     }
 
-    @Override
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void update(@Valid @RequestBody Meal meal, @PathVariable("id") int id) {
-        super.update(meal, id);
+    public ResponseEntity<Meal> updateWithChecks(@Valid @RequestBody Meal meal, @PathVariable("id") int id) {
+        try {
+            super.update(meal, id);
+            return ResponseEntity.noContent().build();
+        } catch (DataIntegrityViolationException e) {
+            String msg = messageSource.getMessage("meal.error.duplicateDateTime", new Object[]{}, LocaleContextHolder.getLocale());
+            throw new IllegalRequestDataException(msg);
+        }
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Meal> createWithLocation(@Valid @RequestBody Meal meal) {
-        Meal created = super.create(meal);
-
+        Meal created;
+        try {
+            created = super.create(meal);
+        } catch (DataIntegrityViolationException e) {
+            String msg = messageSource.getMessage("meal.error.duplicateDateTime", new Object[]{}, LocaleContextHolder.getLocale());
+            throw new IllegalRequestDataException(msg);
+        }
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();

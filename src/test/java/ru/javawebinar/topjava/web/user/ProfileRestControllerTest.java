@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.TestUtil;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.to.UserTo;
@@ -14,7 +16,9 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.List;
+import java.util.Locale;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -82,7 +86,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
     }
 
@@ -100,7 +104,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
     }
 
@@ -118,7 +122,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         Assertions.assertThrows(NotFoundException.class, () -> userService.getByEmail(createdTo.getEmail()));
     }
 
@@ -150,7 +154,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getByEmail(USER.getEmail()), USER);
     }
 
@@ -169,7 +173,7 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getByEmail(USER.getEmail()), USER);
     }
 
@@ -188,7 +192,28 @@ class ProfileRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(userService.getByEmail(USER.getEmail()), USER);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testUpdateDuplicateEmail() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of(messageSource.getMessage("user.error.duplicateEmail", new Object[]{}, Locale.ENGLISH)));
+        UserTo updatedTo = new UserTo(null, "NewName", ADMIN.getEmail(), "newPassword", 1500);
+
+        ResultActions action = mockMvc.perform(put(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(userHttpBasic(USER))
+                .content(JsonUtil.writeValue(updatedTo)))
+                .andExpect(status().isUnprocessableEntity());
+
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(userService.getAll(), ADMIN, USER);
     }
 }

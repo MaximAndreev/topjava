@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,10 +38,14 @@ public class AdminAjaxController extends AbstractUserController {
     @PostMapping
     @ResponseStatus(value = HttpStatus.OK)
     public void createOrUpdate(@Valid UserTo userTo, Locale locale) {
-        if (userTo.isNew()) {
-            super.create(UserUtil.createNewFromTo(userTo));
-        } else {
-            super.update(userTo, userTo.getId());
+        try {
+            if (userTo.isNew()) {
+                super.create(UserUtil.createNewFromTo(userTo));
+            } else {
+                super.update(userTo, userTo.getId());
+            }
+        } catch (DataIntegrityViolationException e) {
+            throw createIllegalRequestDataException();
         }
     }
 

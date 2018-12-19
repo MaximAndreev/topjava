@@ -1,11 +1,13 @@
 package ru.javawebinar.topjava.web.meal;
 
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.exception.ErrorInfo;
@@ -13,7 +15,9 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.List;
+import java.util.Locale;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -102,7 +106,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
     }
 
@@ -122,7 +126,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
     }
 
@@ -142,7 +146,28 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
         ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
 
-        Assertions.assertEquals(expected, returned);
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testUpdateDuplicateDateTime() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL + MEAL1_ID,
+                VALIDATION_ERROR,
+                List.of(messageSource.getMessage("meal.error.duplicateDateTime", new Object[]{}, Locale.ENGLISH)));
+        Meal updated = getUpdated();
+        updated.setDateTime(MEAL2.getDateTime());
+
+        ResultActions action = mockMvc.perform(put(REST_URL + MEAL1_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
         assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
     }
 
@@ -159,6 +184,87 @@ class MealRestControllerTest extends AbstractControllerTest {
 
         assertMatch(returned, created);
         assertMatch(service.getAll(ADMIN_ID), ADMIN_MEAL2, created, ADMIN_MEAL1);
+    }
+
+    @Test
+    void testCreateShortDescription() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("description size must be between 2 and 120"));
+        Meal created = getCreated();
+        created.setDescription("D");
+
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    void testCreateLowCalories() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("calories must be between 10 and 5000"));
+        Meal created = getCreated();
+        created.setCalories(1);
+
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    void testCreateEmptyDateTime() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of("dateTime must not be null"));
+        Meal created = getCreated();
+        created.setDateTime(null);
+
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void testCreateDuplicateDateTime() throws Exception {
+        ErrorInfo expected = new ErrorInfo(
+                "http://localhost" + REST_URL,
+                VALIDATION_ERROR,
+                List.of(messageSource.getMessage("meal.error.duplicateDateTime", new Object[]{}, Locale.ENGLISH)));
+        Meal updated = getCreated();
+        updated.setDateTime(MEAL2.getDateTime());
+
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated))
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isUnprocessableEntity());
+        ErrorInfo returned = readFromJsonResultActions(action, ErrorInfo.class);
+
+        assertThat(returned).isEqualToComparingFieldByField(expected);
+        assertMatch(service.get(MEAL1_ID, START_SEQ), MEAL1);
     }
 
     @Test

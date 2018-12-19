@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -85,6 +84,4 @@ public class ExceptionInfoHandler {
         }
         return new ErrorInfo(req.getRequestURL(), errorType, details);
     }
-
-
 }

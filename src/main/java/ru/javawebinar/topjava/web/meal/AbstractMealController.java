@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web.meal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
@@ -23,6 +24,9 @@ public abstract class AbstractMealController {
 
     @Autowired
     private MealService service;
+
+    @Autowired
+    protected MessageSource messageSource;
 
     public Meal get(int id) {
         int userId = SecurityUtil.authUserId();
