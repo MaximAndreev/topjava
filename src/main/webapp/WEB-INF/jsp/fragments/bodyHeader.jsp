@@ -26,5 +26,23 @@
                 </button>
             </form:form>
         </sec:authorize>
+
+        <div class="dropdown show">
+            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                ${pageContext.response.locale}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" onclick="redirectToCurrentPlus('?language=en')">English</a>
+                <a class="dropdown-item" onclick="redirectToCurrentPlus('?language=ru')">Русский</a>
+            </div>
+        </div>
+
     </div>
 </nav>
+
+<script>
+    function redirectToCurrentPlus(str) {
+        window.location = window.location.pathname + str;
+    }
+</script>

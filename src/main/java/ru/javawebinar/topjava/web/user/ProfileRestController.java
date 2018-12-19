@@ -11,7 +11,6 @@ import ru.javawebinar.topjava.to.UserTo;
 import ru.javawebinar.topjava.util.UserUtil;
 
 import javax.validation.Valid;
-import javax.xml.crypto.Data;
 import java.net.URI;
 
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
